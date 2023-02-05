@@ -41,6 +41,12 @@ const ReactNativeListener = () => {
       // ios
       window.addEventListener("message", listener);
     }
+    return () => {
+      // android
+      document.removeEventListener("message", listener);
+      // ios
+      window.removeEventListener("message", listener);
+    };
   }, [listener]);
 
   return null;
