@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 declare global {
   interface Window {
@@ -9,7 +9,14 @@ declare global {
 
 const ReactNativeListener = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  // fcm token
+  const fcmToken = searchParams.get("fcmToken");
+  // notification 권한상태 (-1: 요청 안함, 0: 거부, 1: 수락, 2: 임시권한)
+  const authorizationStatus = searchParams.get("authorizationStatus");
+  console.log(fcmToken, authorizationStatus);
 
+  // App to Webview message
   const listener = useCallback(
     (event: any) => {
       const pathname = window.location.pathname;
@@ -20,8 +27,7 @@ const ReactNativeListener = () => {
         case "ANDROID_BACK_BUTTON":
           // 홈인 경우 종료
           if (pathname === "/") {
-            const requestMessage = JSON.stringify({ type: "APP_CLOSE" });
-            window.ReactNativeWebView.postMessage(requestMessage);
+            webviewToAppMessage("APP_CLOSE");
           } else {
             // 아닌 경우 뒤로가기
             navigate(-1);
@@ -53,3 +59,10 @@ const ReactNativeListener = () => {
 };
 
 export default ReactNativeListener;
+
+export const webviewToAppMessage = (
+  type: "APP_CLOSE" | "PERMISSION_CAMERA" | "PERMISSION_PHOTO_LIBRARY"
+) => {
+  const requestMessage = JSON.stringify({ type });
+  window.ReactNativeWebView.postMessage(requestMessage);
+};
