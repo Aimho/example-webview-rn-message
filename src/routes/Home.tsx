@@ -1,10 +1,17 @@
 import { useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 
 import logo from "../logo.svg";
 import { webviewToAppMessage } from "../utils/webviewToAppMessage";
 
 function Home() {
+  const [searchParams] = useSearchParams();
+  // fcm token
+  const fcmToken = searchParams.get("fcmToken");
+  // notification 권한상태 (-1: 요청 안함, 0: 거부, 1: 수락, 2: 임시권한)
+  const authorizationStatus = searchParams.get("authorizationStatus");
+  console.log(fcmToken, authorizationStatus);
+
   useEffect(() => {
     // App to Webview message
     const listener = (event: any) => {
